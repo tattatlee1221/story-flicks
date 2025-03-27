@@ -119,14 +119,14 @@ const App: React.FC = () => {
                     </Select>
                 </Form.Item>
                 <Form.Item<FieldType>
-                    label={t('storyForm.txtLLMModel')}
+                    label={t('storyForm.txtLLMModel') +  ' Qwen/Qwen2.5-7B-Instruct'}
                     name="text_llm_model"
                     rules={[{ required: true, message: t('storyForm.txtLLMModelMissMsg') }]}
                 >
                     <Input placeholder={t('storyForm.textLLMPlaceholder')} />
                 </Form.Item>
                 <Form.Item<FieldType>
-                    label={t('storyForm.imgLLMModel')}
+                    label={t('storyForm.imgLLMModel')  +  ' Kwai-Kolors/Kolors'}
                     name="image_llm_model"
                     rules={[{ required: true, message: t('storyForm.imgLLMModelMissMsg') }]}
                 >

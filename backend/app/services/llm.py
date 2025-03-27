@@ -6,6 +6,7 @@ import json
 from http import HTTPStatus
 from pathlib import PurePosixPath
 import requests
+import asyncio
 from urllib.parse import urlparse, unquote
 import random
 
@@ -164,24 +165,37 @@ class LLMService:
             story_prompt (str, optional): 故事提示. Defaults to None.
             language (Language, optional): 语言. Defaults to Language.CHINESE.
             segments (int, optional): 故事分段数. Defaults to 3.
-
         Returns:
             List[Dict[str, Any]]: 故事场景列表，每个场景包含文本、图片提示词和图片URL
         """
         # 先生成故事
-        story_segments = await self.generate_story(
-            request,
-        )
+        story_segments = await self.generate_story(request)
 
-        # 为每个场景生成图片
+        # 逐个生成图片并添加延迟
         for segment in story_segments:
-            try:
-                image_url = self.generate_image(prompt=segment["image_prompt"], resolution=request.resolution, image_llm_provider=request.image_llm_provider, image_llm_model=request.image_llm_model)
-                segment["url"] = image_url
-            except Exception as e:
-                logger.error(f"Failed to generate image for segment: {e}")
-                segment["url"] = None
-
+            max_retries = 5  # 最大重试次数
+            for attempt in range(max_retries):
+                try:
+                    image_url = self.generate_image(
+                        prompt=segment["image_prompt"],
+                        resolution=request.resolution,
+                        image_llm_provider=request.image_llm_provider,
+                        image_llm_model=request.image_llm_model
+                    )
+                    if not image_url:  # 如果返回空字符串，也算失败
+                        raise Exception("Empty image URL returned")
+                    segment["url"] = image_url
+                    logger.info(f"Generated image for segment: {segment['image_prompt']} -> {image_url}")
+                    break  # 成功生成图像后跳出重试循环
+                     # 等待 2 秒后再生成下一个图像
+                except Exception as e:
+                    logger.error(f"Attempt {attempt + 1}/{max_retries} failed for segment {segment['image_prompt']}: {e}")
+                    if attempt < max_retries - 1:  # 如果不是最后一次尝试，等待后重试
+                        await asyncio.sleep(5)  # 在重试前等待 2 秒
+                    else:  # 达到最大重试次数后放弃
+                        logger.error(f"All {max_retries} attempts failed for segment {segment['image_prompt']}")
+                        segment["url"] = None  # 5 次失败后置为 None
+            await asyncio.sleep(5)
         return story_segments
     
     def get_llm_providers(self) -> Dict[str, List[str]]:
