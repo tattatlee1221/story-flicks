@@ -227,7 +227,7 @@ const App: React.FC = () => {
         </Form>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @media (max-width: 768px) {
           .ant-form-item {
             margin-bottom: 12px;

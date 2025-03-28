@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useVideoStore } from "../../stores/index";
 import styles from './index.module.css'
-export default function VideoResult(props: any) {
+export default function VideoResult() {
 
     const { videoUrl } = useVideoStore();
     const videoRef = useRef<HTMLVideoElement>(null);
