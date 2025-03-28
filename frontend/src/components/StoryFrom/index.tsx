@@ -114,29 +114,19 @@ const App: React.FC = () => {
             label={t('storyForm.txtLLMProvider')}
             name="text_llm_provider"
             rules={[{ required: true, message: t('storyForm.txtLLMProviderMissMsg') }]}
-            hidden={true}
+           initialValue="siliconflow"
+           hidden={true}
           >
-            <Select>
-              {llmProviders.textLLMProviders.map((provider) => (
-                <Select.Option key={provider} value={provider}>
-                  {provider}
-                </Select.Option>
-              ))}
-            </Select>
+            <Input placeholder={t('storyForm.textLLMPlaceholder')} />
           </Form.Item>
           <Form.Item<FieldType>
             label={t('storyForm.imgLLMProvider')}
             name="image_llm_provider"
             rules={[{ required: true, message: t('storyForm.imgLLMProviderMissMsg') }]}
+            initialValue="siliconflow"
             hidden={true}
           >
-            <Select>
-              {llmProviders.imageLLMProviders.map((provider) => (
-                <Select.Option key={provider} value={provider}>
-                  {provider}
-                </Select.Option>
-              ))}
-            </Select>
+           <Input placeholder={t('storyForm.textLLMPlaceholder')} />
           </Form.Item>
           <Form.Item<FieldType>
             label={t('storyForm.txtLLMModel')}
